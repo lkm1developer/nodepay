@@ -1,6 +1,6 @@
-# Passport-Tutorial
+# use Passport local stg., mongo db, ssh , remote coin payment 
 
-Node.js authentication tutorial using Passport.js
+Node.js authentication  using Passport.js
 
 ### Prerequisites
 
@@ -35,8 +35,7 @@ npm start
 
 ## Authors
 
-* **Antonio Erdeljac** - *Initial work* - [Passport-Tutorial](https://github.com/AntonioErdeljac/Blog-Tutorial)
+* **lakhvinder singh** - *Initial work* - [Passport-Tutorial](https://github.com/AntonioErdeljac/Blog-Tutorial)
 
 ## Acknowledgments
 
-* This was a tutorial for my [Medium article](https://medium.com/p/4a56ed18e81e)
