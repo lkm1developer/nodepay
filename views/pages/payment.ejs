@@ -1,0 +1,165 @@
+<!-- views/pages/about.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body >
+
+<header>
+    <% include ../partials/header %>
+</header>
+<div class="outer-check">
+    <div class="container">
+        <div class="check-logo">
+            <img src="http://api.onionpay.org/public/css/deeponion_logo.png">
+        </div>
+
+
+        <div class="form-section">
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="amount-sec">
+                        <h2>Amount Due: <span><%= coin %> ONION</span></h2>
+                    </div>
+                    <div class="pay-order">
+                        <h2>Pay for order</h2>
+                        <ul class="order_details">
+                            <li class="order">
+                                Order number:		<strong><%= order.storeOrderId%></strong>
+                            </li>
+
+                            <li class="total">
+                                Total:		<strong>$ <%= order.total%></strong>
+                            </li>
+                            <li class="method">
+                                Payment method:		<strong>DeepOnion </strong>
+                            </li>
+                        </ul>
+
+                    </div>
+                    <div class="cart-section inner-bg">
+                        <h3>Waiting for transaction</h3>
+                        <div class="row">
+                            <div class="cw-col-2 cw-bold"> Send:</div>
+                            <div class="cw-col-5">
+                                <div class="col-ten pull-left">
+                                    <span id="amountonion" class="ngh-blocktext copywrap-amount" style="display: inline-block"><%= coin %> </span> ONION
+                                </div>
+                                <div class="pull-right">
+                                    <button class="btn" data-clipboard-target="#amountonion">
+                                        <img src="http://api.onionpay.org/public/css/copy-icon.png" alt="Copy to clipboard">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                        <div class="row">
+                            <div class="cw-col-2 cw-bold">To:</div>
+                            <div class="cw-col-10 cw-label">
+                                <div class="col-ten pull-left">
+                                <span class="ngh-blocktext copywrap-address" id="payment-address"><%= address %> </span>
+                                </div>
+                                <div class="pull-right">
+                                    <button class="btn" data-clipboard-target="#payment-address">
+                                        <img src="http://api.onionpay.org/public/css/copy-icon.png" alt="Copy to clipboard">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="wating">
+                            <p><span class="label label-warning" id="countdown">Invoice is valid for <span id="mint"></span>m <span id="scnd"></span>s </span></p>
+                            <p>Waiting for payment..</p>
+                            <p><img src="http://api.onionpay.org/public/css/91.gif"></p>
+                            <p class="m-t-30" >Note: The system will check for coins every 10 seconds. Please hold while the transaction confirms.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-5">
+                    <div class="inner-bg">
+                        <div class="text-success">
+                            <h2>Send Payment:</h2>
+                        </div>
+                        <div class="qr-img">
+                            <img src="http://api.onionpay.org/payment/qr/<%= address %>"/>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<input type="hidden" id="counter" value="0"autocomplete="off"/>
+<input type="hidden" id="counterfirst" value="1" autocomplete="off"/>
+
+<script>
+    $( document ).ajaxComplete(function() {
+       var firstTime= $('#counterfirst').val();
+       if(firstTime =="1"){
+           interval = setInterval(counter,1000);
+           $('#counterfirst').val('2');
+       }
+
+    });
+
+    function ckbalance(){
+        $.ajax({
+            type: 'GET',
+            url: '/payment/checkbalance/<%= orderId %>',
+            success: function(result) {
+                if(result.status== true){
+                    window.location.href=result.redirect;
+                }
+                else{
+                    $('#resultdiv').html(result.data);
+                    if(result.expire ==false){
+                        $('#counter').val(parseFloat(result.expireIn));
+                        $('#mint').html(Math.round(parseFloat(result.expireIn/60)));
+                        $('#scnd').html(Math.round(parseFloat(result.expireIn%60)));
+
+                        //clock = $('#countdown').FlipClock(result.expireIn, { clockFace: "HourlyCounter"});
+                       // clock.setCountdown(true);
+                    }
+                    if(result.expire ==true) {
+                        alert("order Expired");
+                       window.location.href=result.redirect;
+                    }
+
+                    setTimeout(function(){ckbalance()}, 10000);
+                }
+            },
+            error: function (err) {
+                console.log('err',err);
+            }
+        });
+    }
+    ckbalance();
+
+    function counter(){
+        var hasValue = parseFloat($('#counter').val());
+        if(hasValue > 0){
+                var scnd= parseInt($('#scnd').html());
+                console.log('scnd',scnd);
+                if(scnd>0){
+                    var hasValue = parseFloat($('#counter').val());
+                     $('#counter').val(hasValue-1);
+                    $('#scnd').html(Math.round(hasValue%60));
+                }
+        }
+
+    }
+
+
+    new ClipboardJS('.btn');
+</script>
+<footer>
+    <% include ../partials/footer %>
+</footer>
+
+</body>
+</html>
